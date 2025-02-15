@@ -1,8 +1,13 @@
-from flask import Flask, render_template, request, jsonify
-import fitz  # PyMuPDF for better PDF text extraction
+from flask import Flask, render_template, request, jsonify, send_from_directory
+import fitz  # PyMuPDF for PDF text extraction
 from transformers import pipeline
+import os
 
 app = Flask(__name__)
+
+# Ensure upload directory exists
+UPLOAD_FOLDER = "uploads"
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 # Load the summarization model
 summarizer = pipeline("summarization", model="t5-small", tokenizer="t5-small")
@@ -14,14 +19,11 @@ def extract_text_from_pdf(pdf_path):
         doc = fitz.open(pdf_path)
         for page in doc:
             text += page.get_text("text") + "\n"
-        
-        # Clean the extracted text (remove extra spaces & newlines)
-        text = " ".join(text.split())
+        text = " ".join(text.split())  # Remove extra spaces & newlines
     except Exception as e:
         print("Error extracting text:", e)
         return None
 
-    print("Extracted Text (First 500 chars):\n", text[:500])  # Debugging Output
     return text if text else None
 
 def summarize_text(text, max_length=150, min_length=50):
@@ -41,7 +43,6 @@ def summarize_text(text, max_length=150, min_length=50):
         if current_chunk:
             chunks.append(current_chunk)
 
-        # Summarize each chunk and combine results
         summarized_chunks = [summarizer("summarize: " + chunk, max_length=max_length, min_length=min_length, do_sample=False)[0]['summary_text'] for chunk in chunks]
         return " ".join(summarized_chunks)
     else:
@@ -60,7 +61,7 @@ def summarize():
     if pdf_file.filename == '':
         return jsonify({'error': 'No selected file'}), 400
 
-    pdf_path = f"uploads/{pdf_file.filename}"
+    pdf_path = os.path.join(UPLOAD_FOLDER, pdf_file.filename)
     pdf_file.save(pdf_path)
 
     # Extract text
@@ -75,3 +76,4 @@ def summarize():
 
 if __name__ == '__main__':
     app.run(debug=True)
+

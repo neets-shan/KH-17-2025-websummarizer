@@ -1,0 +1,19 @@
+body {
+    background-color: #f8f9fa;
+    font-family: Arial, sans-serif;
+}
+
+.card {
+    border-radius: 10px;
+}
+
+.btn-primary {
+    font-size: 18px;
+    padding: 10px 20px;
+}
+
+#summaryText {
+    min-height: 100px;
+    font-size: 16px;
+    color: #333;
+}
