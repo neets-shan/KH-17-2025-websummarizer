@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MakeItSimpL</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-<<<<<<< HEAD
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
     <style>
@@ -95,40 +94,8 @@
     <div class="container mt-5" id="about">
         <h3>About MakeItSimpL</h3>
         <p>MakeItSimpL helps you simplify complex government forms, legal documents, and medical prescriptions by converting them into easy-to-understand summaries.</p>
-=======
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-</head>
-<body>
-
-<!-- Navbar -->
-<nav class="navbar navbar-dark bg-primary">
-    <div class="container">
-        <a class="navbar-brand" href="#">PDF Summarizer</a>
-    </div>
-</nav>
-
-<!-- Main Container -->
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow-lg p-4">
-                <h2 class="text-center mb-4">Upload a PDF to Summarize</h2>
-                <div class="mb-3">
-                    <input type="file" id="pdfInput" class="form-control">
-                </div>
-                <div class="text-center">
-                    <button class="btn btn-primary" onclick="uploadAndSummarize()">Summarize</button>
-                </div>
-                <div class="mt-4">
-                    <h4>Summary:</h4>
-                    <p id="summaryText" class="border p-3 bg-light rounded"></p>
-                </div>
-            </div>
-        </div>
->>>>>>> 8c50ead92a2e734af9258d3a229b8203505241b2
     </div>
 
-<<<<<<< HEAD
     <div class="container mt-5" id="how-it-works">
         <h3>How It Works</h3>
         <ul>
@@ -137,22 +104,6 @@
             <li>Get a clear and easy-to-read summary instantly.</li>
         </ul>
     </div>
-=======
-<!-- Footer -->
-<footer class="text-center mt-5 py-3 bg-light">
-    <p class="mb-0">© 2025 PDF Summarizer | Built with Flask & Bootstrap</p>
-</footer>
-
-<script>
-function uploadAndSummarize() {
-    let formData = new FormData();
-    let fileInput = document.getElementById("pdfInput");
-    if (fileInput.files.length === 0) {
-        alert("Please select a PDF file.");
-        return;
-    }
-    formData.append("pdf", fileInput.files[0]);
->>>>>>> 8c50ead92a2e734af9258d3a229b8203505241b2
 
     <footer class="footer">© 2025 MakeItSimpL - Simplifying Documents for Everyone</footer>
     
