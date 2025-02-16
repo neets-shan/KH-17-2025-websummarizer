@@ -1,19 +1,21 @@
-from flask import Flask, render_template, request, jsonify, send_from_directory
+from flask import Flask, render_template, request, jsonify, send_file
 import fitz  # PyMuPDF for PDF text extraction
 from transformers import pipeline
 import os
+from gtts import gTTS  # Import gTTS for text-to-speech
 
 app = Flask(__name__)
 
-# Ensure upload directory exists
 UPLOAD_FOLDER = "uploads"
+AUDIO_FOLDER = "audio"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+os.makedirs(AUDIO_FOLDER, exist_ok=True)
 
 # Load the summarization model
 summarizer = pipeline("summarization", model="t5-small", tokenizer="t5-small")
 
 def extract_text_from_pdf(pdf_path):
-    """Extracts text from a PDF file using PyMuPDF (better than PyPDF2)."""
+    """Extracts text from a PDF file using PyMuPDF."""
     text = ""
     try:
         doc = fitz.open(pdf_path)
@@ -23,30 +25,18 @@ def extract_text_from_pdf(pdf_path):
     except Exception as e:
         print("Error extracting text:", e)
         return None
-
     return text if text else None
 
 def summarize_text(text, max_length=150, min_length=50):
     """Summarizes long text by splitting into smaller chunks if needed."""
-    if len(text) > 1000:  # If text is too long, split into chunks
-        sentences = text.split(". ")
-        chunks = []
-        current_chunk = ""
+    return summarizer("summarize: " + text, max_length=max_length, min_length=min_length, do_sample=False)[0]['summary_text']
 
-        for sentence in sentences:
-            if len(current_chunk) + len(sentence) < 1000:
-                current_chunk += sentence + ". "
-            else:
-                chunks.append(current_chunk)
-                current_chunk = sentence + ". "
-
-        if current_chunk:
-            chunks.append(current_chunk)
-
-        summarized_chunks = [summarizer("summarize: " + chunk, max_length=max_length, min_length=min_length, do_sample=False)[0]['summary_text'] for chunk in chunks]
-        return " ".join(summarized_chunks)
-    else:
-        return summarizer("summarize: " + text, max_length=max_length, min_length=min_length, do_sample=False)[0]['summary_text']
+def generate_tts(text, filename="output.mp3"):
+    """Converts text to speech and saves it as an MP3 file."""
+    tts = gTTS(text=text, lang="en")
+    file_path = os.path.join(AUDIO_FOLDER, filename)
+    tts.save(file_path)
+    return file_path
 
 @app.route('/')
 def index():
@@ -71,9 +61,16 @@ def summarize():
 
     # Summarize the extracted text
     summary = summarize_text(text)
-    
-    return jsonify({'summary': summary})
+
+    # Generate speech file
+    audio_path = generate_tts(summary)
+
+    return jsonify({'summary': summary, 'audio_url': f'/audio/{os.path.basename(audio_path)}'})
+
+@app.route('/audio/<filename>')
+def serve_audio(filename):
+    """Serves the generated audio file."""
+    return send_file(os.path.join(AUDIO_FOLDER, filename), as_attachment=False)
 
 if __name__ == '__main__':
     app.run(debug=True)
-

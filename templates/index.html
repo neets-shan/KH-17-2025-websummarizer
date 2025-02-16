@@ -25,10 +25,11 @@
             border-radius: 10px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
         }
-        .btn-primary {
+        .btn-primary, .btn-secondary {
             width: 100%;
             font-size: 18px;
             transition: 0.3s;
+            margin-top: 10px;
         }
         .btn-primary:hover {
             background-color: #5a67d8;
@@ -64,6 +65,10 @@
             color: white;
             font-size: 14px;
         }
+        .audio-container {
+            display: none;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -88,6 +93,12 @@
             <div class="summary-box border p-3">
                 <p id="summaryText" class="text-muted">Your summary will appear here...</p>
             </div>
+            <button id="listenButton" class="btn btn-secondary" style="display: none;" onclick="playAudio()">
+                🔊 Listen
+            </button>
+            <div class="audio-container">
+                <audio id="audioPlayer" controls></audio>
+            </div>
         </div>
     </div>
 
@@ -111,10 +122,12 @@
         function uploadAndSummarize() {
             let formData = new FormData();
             let fileInput = document.getElementById("pdfInput");
+
             if (fileInput.files.length === 0) {
                 alert("Please select a PDF file.");
                 return;
             }
+            
             formData.append("pdf", fileInput.files[0]);
 
             document.querySelector(".loading").style.display = "block";
@@ -122,13 +135,23 @@
                 .then(response => response.json())
                 .then(data => {
                     document.querySelector(".loading").style.display = "none";
+                    
                     if (data.error) {
                         alert(data.error);
                     } else {
                         document.getElementById("summaryText").innerText = data.summary;
+
+                        // Enable the Listen button & set the audio source
+                        document.getElementById("listenButton").style.display = "block";
+                        document.getElementById("audioPlayer").src = data.audio_url;
+                        document.querySelector(".audio-container").style.display = "block";
                     }
                 })
                 .catch(error => console.error("Error:", error));
+        }
+
+        function playAudio() {
+            document.getElementById("audioPlayer").play();
         }
     </script>
 </body>
